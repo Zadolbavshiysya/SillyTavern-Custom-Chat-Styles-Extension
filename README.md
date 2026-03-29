@@ -13,7 +13,7 @@
 <img width="941" height="235" alt="изображение" src="https://github.com/user-attachments/assets/378b902c-ccf0-4996-8f9b-91ec3c7e6d46" />
 
 - [sys]...[/sys] - Для сообщений системы.
-- <img width="936" height="211" alt="изображение" src="https://github.com/user-attachments/assets/b2da0118-9728-4c32-a8f0-fb40677ae69e" />
+<img width="936" height="211" alt="изображение" src="https://github.com/user-attachments/assets/b2da0118-9728-4c32-a8f0-fb40677ae69e" />
 
 Все цвета можно поменять в насторйках расширения:
 
