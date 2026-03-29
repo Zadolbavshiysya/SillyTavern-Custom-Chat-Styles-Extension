@@ -3,10 +3,10 @@
 
 На данный момент существуют теги:
 
-* - [chat]Имя: Сообщение[/chat] - Для чата стримов и подобного.*
+ - [chat]Имя: Сообщение[/chat] - Для чата стримов и подобного.
 <img width="800" alt="изображение" src="https://github.com/user-attachments/assets/62bd0996-fc8a-436b-9519-085250e0943a" />
 
-* - [phone]Имя: Сообщение[/phone] - Для сообщений в месенджерах.*
+ - [phone]Имя: Сообщение[/phone] - Для сообщений в месенджерах.
 <img width="800" alt="изображение" src="https://github.com/user-attachments/assets/5a59507c-3c1e-407c-b7f2-2b61701e138f" />
 
 
@@ -14,7 +14,7 @@
 <img width="800" alt="изображение" src="https://github.com/user-attachments/assets/e635a043-376c-4d79-85b6-9faec701379f" />
 
 
-# - [sys]...[/sys] - Для сообщений системы.
+ - [sys]...[/sys] - Для сообщений системы.
 <img width="800" alt="изображение" src="https://github.com/user-attachments/assets/7d1e571a-3581-4568-b59f-eb4eaf81930e" />
 
 
