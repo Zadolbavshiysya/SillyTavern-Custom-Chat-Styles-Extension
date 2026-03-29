@@ -4,7 +4,8 @@
 На данный момент существуют теги:
 
 - [chat]Имя: Сообщение[/chat] - Для чата стримов и подобного.
-<img height="50%" alt="изображение" src="https://github.com/user-attachments/assets/9e7fee48-67cc-412a-9b44-c85512f6d921" />
+<img width="823" height="161" alt="изображение" src="https://github.com/user-attachments/assets/62bd0996-fc8a-436b-9519-085250e0943a" />
+
 
 - [phone]Имя: Сообщение[/phone] - Для сообщений в месенджерах.
 <img width="932" height="239" alt="изображение" src="https://github.com/user-attachments/assets/b4587086-19a0-4eef-8137-80ac6a3109f0" />
