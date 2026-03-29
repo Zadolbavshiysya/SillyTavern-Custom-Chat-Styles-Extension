@@ -197,7 +197,7 @@ function loadSettingsUI() {
             </div>
 
             <div class="ccs-settings-grid">
-                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor);">📱 ТЕЛЕФОН (&lt;phone&gt;)</div>
+                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor);">ТЕЛЕФОН (&lt;phone&gt;)</div>
                 <div class="ccs-color-item"><span>Фон</span> <input type="color" class="ccs-color-swatch" id="ccs-phoneBg"></div>
                 <div class="ccs-color-item"><span>Входящий</span> <input type="color" class="ccs-color-swatch" id="ccs-phoneIn"></div>
                 <div class="ccs-color-item"><span>Текст In</span> <input type="color" class="ccs-color-swatch" id="ccs-textIn"></div>
@@ -205,13 +205,13 @@ function loadSettingsUI() {
                 <div class="ccs-color-item"><span>Текст Out</span> <input type="color" class="ccs-color-swatch" id="ccs-textOut"></div>
                 <div></div>
 
-                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">💬 СТРИМ ЧАТ (&lt;chat&gt;)</div>
+                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">СТРИМ ЧАТ (&lt;chat&gt;)</div>
                 <div class="ccs-color-item"><span>Фон</span> <input type="color" class="ccs-color-swatch" id="ccs-streamBg"></div>
                 <div class="ccs-color-item"><span>Линия</span> <input type="color" class="ccs-color-swatch" id="ccs-streamBorder"></div>
                 <div class="ccs-color-item"><span>Текст</span> <input type="color" class="ccs-color-swatch" id="ccs-streamText"></div>
                 <div></div>
 
-                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">💠 СИСТЕМНОЕ ОКНО (&lt;sys&gt;)</div>
+                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">СИСТЕМНОЕ ОКНО (&lt;sys&gt;)</div>
                 <div class="ccs-color-item"><span>Фон</span> <input type="color" class="ccs-color-swatch" id="ccs-sysBg"></div>
                 <div class="ccs-color-item"><span>Рамка/Свечение</span> <input type="color" class="ccs-color-swatch" id="ccs-sysBorder"></div>
                 <div class="ccs-color-item"><span>Текст</span> <input type="color" class="ccs-color-swatch" id="ccs-sysText"></div>
