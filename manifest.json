@@ -1,0 +1,9 @@
+{
+    "display_name": "Custom Chat Styles",
+    "loading_order": 10,
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Zadolbavshiysya",
+    "version": "1.0.0",
+    "description": "Стили для офтрмления текста с помощью тегов. Включает меню настроек и инжект системного промпта."
+}
