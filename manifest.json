@@ -4,6 +4,6 @@
     "js": "index.js",
     "css": "style.css",
     "author": "Zadolbavshiysya",
-    "version": "1.0.0",
+    "version": "0.2.0",
     "description": "Стили для офтрмления текста с помощью тегов. Включает меню настроек и инжект системного промпта."
 }

@@ -3,93 +3,94 @@ import { extension_settings, getContext } from "../../../extensions.js";
 
 const extName = "CustomChatStyles";
 
+const COLOR_KEYS = [
+    'phoneBg', 'phoneIn', 'phoneOut', 'textIn', 'textOut',
+    'streamBg', 'streamBorder', 'streamText',
+    'sysBg', 'sysBorder', 'sysText',
+    'achBg', 'achBorder', 'achText',
+    'thBg', 'thBorder', 'thText'
+];
+
 const THEMES = {
-    "Telegram (Темная)": { phoneBg: "#0e1621", phoneIn: "#182533", phoneOut: "#2b5278", textIn: "#ffffff", textOut: "#ffffff", streamBg: "#18181b", streamBorder: "#b38dee", streamText: "#efeff1", sysBg: "#0f1928", sysBorder: "#4da6ff", sysText: "#e6f2ff" },
-    "iMessage (Светлая)": { phoneBg: "#f3f3f3", phoneIn: "#e5e5ea", phoneOut: "#0b84ff", textIn: "#000000", textOut: "#ffffff", streamBg: "#ffffff", streamBorder: "#a970ff", streamText: "#000000", sysBg: "#f5f5f5", sysBorder: "#ff8c00", sysText: "#333333" },
-    "Discord (Темная)": { phoneBg: "#313338", phoneIn: "#2b2d31", phoneOut: "#5865f2", textIn: "#dbdee1", textOut: "#ffffff", streamBg: "#313338", streamBorder: "#5865f2", streamText: "#dbdee1", sysBg: "#1e1f22", sysBorder: "#fbbc05", sysText: "#dbdee1" },
-    "WhatsApp (Светлая)": { phoneBg: "#efeae2", phoneIn: "#ffffff", phoneOut: "#d9fdd3", textIn: "#111b21", textOut: "#111b21", streamBg: "#f0f2f5", streamBorder: "#25d366", streamText: "#111b21", sysBg: "#0d1418", sysBorder: "#00ff00", sysText: "#00ff00" }
+    "Telegram (Темная)": {
+        phoneBg: "#0e1621", phoneIn: "#182533", phoneOut: "#2b5278", textIn: "#ffffff", textOut: "#ffffff",
+        streamBg: "#18181b", streamBorder: "#b38dee", streamText: "#efeff1",
+        sysBg: "#0d1117", sysBorder: "#4da6ff", sysText: "#e6f2ff",
+        achBg: "#1e1e1e", achBorder: "#f1c40f", achText: "#ffffff",
+        thBg: "rgba(255,255,255,0.06)", thBorder: "#6b84a0", thText: "#a6b3c2"
+    },
+    "iMessage (Светлая)": {
+        phoneBg: "#f3f3f3", phoneIn: "#e5e5ea", phoneOut: "#0b84ff", textIn: "#000000", textOut: "#ffffff",
+        streamBg: "#ffffff", streamBorder: "#a970ff", streamText: "#000000",
+        sysBg: "#1a1a1a", sysBorder: "#ff8c00", sysText: "#ffffff",
+        achBg: "#ffffff", achBorder: "#ffcc00", achText: "#000000",
+        thBg: "rgba(0,0,0,0.05)", thBorder: "#8e8e93", thText: "#555555"
+    },
+    "Discord (Темная)": {
+        phoneBg: "#313338", phoneIn: "#2b2d31", phoneOut: "#5865f2", textIn: "#dbdee1", textOut: "#ffffff",
+        streamBg: "#313338", streamBorder: "#5865f2", streamText: "#dbdee1",
+        sysBg: "#1e1f22", sysBorder: "#fbbc05", sysText: "#dbdee1",
+        achBg: "#2b2d31", achBorder: "#fee75c", achText: "#dbdee1",
+        thBg: "rgba(43,45,49,0.8)", thBorder: "#80848e", thText: "#b5bac1"
+    }
 };
 
 const defaultSettings = {
-    phoneBg: "#0e1621", phoneIn: "#182533", phoneOut: "#2b5278",
-    textIn: "#ffffff", textOut: "#ffffff",
-    streamBg: "#18181b", streamBorder: "#9146FF", streamText: "#efeff1",
-    sysBg: "#0f1928", sysBorder: "#4da6ff", sysText: "#e6f2ff",
+    ...THEMES["Telegram (Темная)"],
     currentThemeName: "Telegram (Темная)",
     userThemes: {},
-    systemPrompt: `[System Note:
-1. Messaging: Wrap smartphone/SMS text in <phone>...</phone>. Wrap stream/live chats in <chat>...</chat>. Use "Name: Message" format inside them.
-2. System/RPG Windows: Wrap non-human system messages, AI core alerts, RPG status screens, or terminal logs in <sys>...</sys>. (No "Name:" format needed here).
-3. IMPORTANT: You MUST close every tag immediately after the content. An unclosed tag is a critical error.
-4. Natural Behavior for Phones: Mimic human texting patterns (abbreviations, pacing).
-5. For <sys> tag: Keep the tone robotic, analytical, or game-like.]`
+    systemPrompt: `[USE TAGS STRICTLY IN CONTEXT. Accidental use of <sys>, <ach>, or <thought> without a plot-related need is a CRITICAL ERROR.
+1. Smartphone: <phone>Name: Text</phone>. Each message is a new line.
+2. Stream: <chat>Name: Text</chat>. Each message is a new line.
+3. System: <sys>Text <btn>Action</btn></sys>. For non-game notifications only.
+4. Achievements: <ach>Title | Description</ach>. For important or funny moments only.
+5. Thoughts: <thought>Text</thought>. WRITE STRICTLY AT THE VERY END OF THE MESSAGE (after the main text).
+IMPORTANT: Always close tags. Don't use tags unless the situation requires it.`
 };
 
-if (!extension_settings[extName]) {
-    extension_settings[extName] = JSON.parse(JSON.stringify(defaultSettings));
-}
+if (!extension_settings[extName]) extension_settings[extName] = JSON.parse(JSON.stringify(defaultSettings));
 const settings = extension_settings[extName];
 
 for (const key in defaultSettings) {
-    if (settings[key] === undefined) {
-        settings[key] = defaultSettings[key];
-    }
+    if (settings[key] === undefined) settings[key] = defaultSettings[key];
 }
-if (settings.currentThemeName === "custom") {
-    settings.currentThemeName = "Telegram (Темная)";
-}
+if (settings.currentThemeName === "custom") settings.currentThemeName = "Telegram (Темная)";
 
 function setupRegexBypasses() {
-    if (!extension_settings.regex) {
-        extension_settings.regex = [];
-    }
-
-    const tags = ['phone', 'chat', 'sys'];
+    if (!extension_settings.regex) extension_settings.regex = [];
+    const tags = ['phone', 'chat', 'sys', 'btn', 'ach', 'thought'];
     let isModified = false;
 
     tags.forEach(tag => {
         const scriptName = `CCS - ${tag.charAt(0).toUpperCase() + tag.slice(1)} Tag Bypass`;
-        const existingIndex = extension_settings.regex.findIndex(r => r.scriptName === scriptName);
-
-        if (existingIndex === -1) {
-            const newRegex = {
+        if (extension_settings.regex.findIndex(r => r.scriptName === scriptName) === -1) {
+            extension_settings.regex.push({
                 id: `ccs_${tag}_bypass_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
                 scriptName: scriptName,
                 findRegex: `/<${tag}>([\\s\\S]*?)<\\/${tag}>/gim`,
                 replaceString: `[${tag}]$1[/${tag}]`,
-                trimStrings: [],
-                placement: [1, 2],
-                disabled: false,
-                markdownOnly: true,
-                promptOnly: false,
-                runOnEdit: false,
-                minDepth: null,
-                maxDepth: null
-            };
-            extension_settings.regex.push(newRegex);
+                trimStrings: [], placement: [1, 2], disabled: false,
+                markdownOnly: true, promptOnly: false, runOnEdit: false
+            });
             isModified = true;
         }
     });
 
-    if (isModified) {
-        saveSettingsDebounced();
-        console.log("[CustomChatStyles] Успешно добавлены автоматические Regex обходы (Bypasses).");
-    }
+    if (isModified) saveSettingsDebounced();
 }
 
 function updateCssVariables() {
     const root = document.documentElement;
-    const s = settings;
-    const vars = {
-        '--ccs-phone-bg': s.phoneBg, '--ccs-phone-in': s.phoneIn, '--ccs-phone-out': s.phoneOut,
-        '--ccs-text-in': s.textIn, '--ccs-text-out': s.textOut,
-        '--ccs-stream-bg': s.streamBg, '--ccs-stream-border': s.streamBorder, '--ccs-stream-text': s.streamText,
-        '--ccs-sys-bg': s.sysBg, '--ccs-sys-border': s.sysBorder, '--ccs-sys-text': s.sysText
-    };
-    for (const [key, val] of Object.entries(vars)) root.style.setProperty(key, val);
+    COLOR_KEYS.forEach(k => {
+        const cssVar = '--ccs-' + k.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+        root.style.setProperty(cssVar, settings[k]);
+    });
 }
 
-// --- ПАРСИНГ И ОБРАБОТКА ---
+function cleanTagsContent(html) {
+    return html.replace(/^(?:<p>|<\/?br\s*\/?>|\s)+|(?:<\/p>|<\/?br\s*\/?>|\s)+$/gi, '').trim();
+}
+
 function parseChatBlocks(content) {
     let clean = content.replace(/<\/p>\s*<p>/gi, '<br>').replace(/<\/?p>/gi, '').trim();
     let lines = clean.split(/<br\s*\/?>|\n/i).map(l => l.trim()).filter(l => l !== '');
@@ -103,9 +104,7 @@ function parseChatBlocks(content) {
             if (currentSpeaker !== null) bubbles.push({ speaker: currentSpeaker, text: currentText.join('<br>') });
             currentSpeaker = match[1].trim();
             currentText = [match[2].trim()];
-        } else if (currentSpeaker) {
-            currentText.push(cleanLine);
-        }
+        } else if (currentSpeaker) currentText.push(cleanLine);
     }
     if (currentSpeaker) bubbles.push({ speaker: currentSpeaker, text: currentText.join('<br>') });
     return bubbles;
@@ -117,41 +116,115 @@ function processMessage(messageId) {
 
     let html = msgEl.innerHTML;
 
-    html = html.replace(/(?:&lt;|\[)phone(?:&gt;|\])/gi, '<phone>').replace(/(?:&lt;|\[)\/phone(?:&gt;|\])/gi, '</phone>');
-    html = html.replace(/(?:&lt;|\[)chat(?:&gt;|\])/gi, '<chat>').replace(/(?:&lt;|\[)\/chat(?:&gt;|\])/gi, '</chat>');
-    html = html.replace(/(?:&lt;|\[)sys(?:&gt;|\])/gi, '<sys>').replace(/(?:&lt;|\[)\/sys(?:&gt;|\])/gi, '</sys>');
+    const tagsToRestore = ['phone', 'chat', 'sys', 'btn', 'ach', 'thought'];
+    tagsToRestore.forEach(tag => {
+        const regexOpen = new RegExp(`(?:&lt;|\\[)${tag}(?:&gt;|\\])`, 'gi');
+        const regexClose = new RegExp(`(?:&lt;|\\[)\\/${tag}(?:&gt;|\\])`, 'gi');
+        html = html.replace(regexOpen, `<${tag}>`).replace(regexClose, `</${tag}>`);
+    });
 
-    if (!/<phone>|<chat>|<sys>/i.test(html)) return;
+    if (!/<(?:phone|chat|sys|ach|thought)>/i.test(html)) return;
 
     const userName = (getContext().name1 || 'You').toLowerCase();
 
+    // 1. ТЕЛЕФОН
     html = html.replace(/<phone>([\s\S]*?)<\/phone>/gi, (m, content) => {
-        const bubbles = parseChatBlocks(content);
+        const bubbles = parseChatBlocks(cleanTagsContent(content));
         const inner = bubbles.map(b => {
             const isUser = b.speaker.toLowerCase() === userName || ['you', 'user', 'я'].includes(b.speaker.toLowerCase());
+            const check = `<span class="phone-checks"><i class="fa-solid fa-check-double"></i></span>`;
             return `<div class="custom-phone-message ${isUser ? 'custom-phone-msg-right' : 'custom-phone-msg-left'}">
-                <span class="phone-speaker">${b.speaker}</span>${b.text}</div>`;
+                <span class="phone-speaker">${b.speaker}</span>${b.text}${check}</div>`;
         }).join('');
-        return `<div class="custom-phone-container ccs-container">${inner}</div>`;
+
+        return `<div class="custom-phone-container ccs-container">
+                    <div class="custom-phone-topbar">
+                        <span><i class="fa-solid fa-signal" style="margin-right:3px;"></i> LTE</span>
+                        <span><i class="fa-solid fa-battery-three-quarters"></i></span>
+                    </div>
+                    <div class="custom-phone-messages">${inner}</div>
+                    <div class="custom-phone-input-bar">
+                        <i class="fa-solid fa-plus"></i>
+                        <div class="custom-phone-input-fake">iMessage</div>
+                        <i class="fa-solid fa-microphone"></i>
+                    </div>
+                </div>`;
     });
 
+    // 2. ЧАТ СТРИМА (Эстетичный с динамическими зрителями)
     html = html.replace(/<chat>([\s\S]*?)<\/chat>/gi, (m, content) => {
-        const bubbles = parseChatBlocks(content);
-        const colors = ['#FF4500', '#2E8B57', '#1E90FF', '#FF69B4', '#8A2BE2'];
+        const cleanStr = cleanTagsContent(content);
+        const bubbles = parseChatBlocks(cleanStr);
+        const colors = ['#FF4500', '#2E8B57', '#1E90FF', '#FF69B4', '#8A2BE2', '#FFA500', '#20B2AA'];
         const inner = bubbles.map(b => {
             const color = colors[[...b.speaker].reduce((acc, c) => acc + c.charCodeAt(0), 0) % colors.length];
-            return `<div class="custom-stream-message"><span class="stream-user" style="color:${color}">${b.speaker}:</span> ${b.text}</div>`;
+            return `<div class="custom-stream-message"><span class="stream-user" style="color:${color}">${b.speaker}:</span><span class="stream-text-content">${b.text}</span></div>`;
         }).join('');
-        return `<div class="custom-stream-container ccs-container">${inner}</div>`;
+
+        // Генерация реалистичного числа зрителей на основе содержимого чата
+        const hash = [...cleanStr].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const dynamicViewers = (1.2 + (hash % 88) / 10).toFixed(1) + 'k';
+
+        return `<div class="custom-stream-container ccs-container">
+                    <div class="custom-stream-header">
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <span class="stream-live-badge">LIVE</span>
+                        </div>
+                        <span style="opacity:0.5; font-size:11px; font-weight:700;">TOP CHAT</span>
+                    </div>
+                    <div class="custom-stream-messages">
+                        ${inner}
+                    </div>
+                </div>`;
     });
 
+    // 3. СИСТЕМА
     html = html.replace(/<sys>([\s\S]*?)<\/sys>/gi, (m, content) => {
-        let cleanContent = content.replace(/<\/p>\s*<p>/gi, '<br>').replace(/<\/?p>/gi, '').trim();
-        cleanContent = cleanContent.replace(/\n/g, '<br>');
+        let cleanStr = cleanTagsContent(content);
+        let buttonsHtml = '';
+        cleanStr = cleanStr.replace(/<btn>([\s\S]*?)<\/btn>/gi, (m, btnText) => {
+            buttonsHtml += `<div class="sys-action-btn">${btnText.trim()}</div>`;
+            return '';
+        });
+        cleanStr = cleanTagsContent(cleanStr).replace(/\n/g, '<br>');
+        const btnsContainer = buttonsHtml ? `<div class="custom-sys-buttons">${buttonsHtml}</div>` : '';
         return `<div class="custom-sys-container ccs-container">
-                    <div class="custom-sys-header">SYSTEM NOTIFICATION</div>
-                    <div class="custom-sys-content">${cleanContent}</div>
+                    <div class="custom-sys-topbar"><span class="custom-sys-title">SYSTEM ALERT</span></div>
+                    <div class="custom-sys-content">${cleanStr}</div>
+                    ${btnsContainer}
                 </div>`;
+    });
+
+    // 4. АЧИВКИ
+    html = html.replace(/<ach>([\s\S]*?)<\/ach>/gi, (m, content) => {
+        let cleanStr = cleanTagsContent(content).replace(/<\/?p>/gi, '').trim();
+        let parts = cleanStr.split(/\||:/);
+        let title = "ДОСТИЖЕНИЕ ПОЛУЧЕНО";
+        let desc = cleanStr;
+
+        if (parts.length > 1) {
+            title = parts[0].trim();
+            desc = parts.slice(1).join(':').trim();
+        }
+
+        return `<div class="custom-ach-container ccs-container">
+                    <div class="custom-ach-icon-box">
+                        <div class="custom-ach-sparkle s1">✦</div>
+                        <div class="custom-ach-sparkle s2">✦</div>
+                        <div class="custom-ach-sparkle s3">✦</div>
+                        <div class="custom-ach-icon">✦</div>
+                    </div>
+                    <div class="custom-ach-text-wrap">
+                        <div class="custom-ach-title">${title}</div>
+                        <div class="custom-ach-desc">${desc}</div>
+                    </div>
+                </div>`;
+    });
+
+    // 5. МЫСЛИ
+    html = html.replace(/<thought>([\s\S]*?)<\/thought>/gi, (m, content) => {
+        let cleanStr = cleanTagsContent(content).replace(/\n/g, '<br>');
+        return `<div class="custom-thought-container ccs-container">${cleanStr}</div>`;
     });
 
     msgEl.innerHTML = html;
@@ -167,16 +240,12 @@ function updateThemeDropdown() {
     for (const t in settings.userThemes) select.append($('<option>', { value: 'user_' + t, text: '⭐ ' + t }));
 
     select.val(settings.currentThemeName);
-    if (settings.currentThemeName.startsWith('user_')) {
-        $('#ccs-btn-delete').show();
-    } else {
-        $('#ccs-btn-delete').hide();
-    }
+    if (settings.currentThemeName.startsWith('user_')) $('#ccs-btn-delete').show();
+    else $('#ccs-btn-delete').hide();
 }
 
 function syncInputs() {
-    const keys = ['phoneBg', 'phoneIn', 'phoneOut', 'textIn', 'textOut', 'streamBg', 'streamBorder', 'streamText', 'sysBg', 'sysBorder', 'sysText'];
-    keys.forEach(k => $(`#ccs-${k}`).val(settings[k]));
+    COLOR_KEYS.forEach(k => $(`#ccs-${k}`).val(settings[k]));
 }
 
 function loadSettingsUI() {
@@ -188,12 +257,10 @@ function loadSettingsUI() {
         </div>
 
         <div class="inline-drawer-content" style="padding: 10px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                <div style="display:flex; gap:5px; width: 100%;">
-                    <select id="ccs-theme-select" class="text_pole" style="flex-grow: 1;"></select>
-                    <div id="ccs-btn-add" class="menu_button fa-solid fa-plus" title="Добавить новую тему"></div>
-                    <div id="ccs-btn-delete" class="menu_button fa-solid fa-trash" title="Удалить тему" style="color:red; display:none;"></div>
-                </div>
+            <div style="display:flex; gap:5px; margin-bottom:15px; width: 100%;">
+                <select id="ccs-theme-select" class="text_pole" style="flex-grow: 1;"></select>
+                <div id="ccs-btn-add" class="menu_button fa-solid fa-plus" title="Сохранить как новую тему"></div>
+                <div id="ccs-btn-delete" class="menu_button fa-solid fa-trash" title="Удалить тему" style="color:red; display:none;"></div>
             </div>
 
             <div class="ccs-settings-grid">
@@ -213,14 +280,26 @@ function loadSettingsUI() {
 
                 <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">СИСТЕМНОЕ ОКНО (&lt;sys&gt;)</div>
                 <div class="ccs-color-item"><span>Фон</span> <input type="color" class="ccs-color-swatch" id="ccs-sysBg"></div>
-                <div class="ccs-color-item"><span>Рамка/Свечение</span> <input type="color" class="ccs-color-swatch" id="ccs-sysBorder"></div>
+                <div class="ccs-color-item"><span>Акцент/Кнопки</span> <input type="color" class="ccs-color-swatch" id="ccs-sysBorder"></div>
                 <div class="ccs-color-item"><span>Текст</span> <input type="color" class="ccs-color-swatch" id="ccs-sysText"></div>
+                <div></div>
+
+                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">АЧИВКИ (&lt;ach&gt;)</div>
+                <div class="ccs-color-item"><span>Фон</span> <input type="color" class="ccs-color-swatch" id="ccs-achBg"></div>
+                <div class="ccs-color-item"><span>Акцент/Звезда</span> <input type="color" class="ccs-color-swatch" id="ccs-achBorder"></div>
+                <div class="ccs-color-item"><span>Текст</span> <input type="color" class="ccs-color-swatch" id="ccs-achText"></div>
+                <div></div>
+
+                <div style="grid-column: span 2; opacity:0.7; font-size:0.9em; border-bottom:1px solid var(--SmartThemeBorderColor); margin-top:5px;">МЫСЛИ (&lt;thought&gt;)</div>
+                <div class="ccs-color-item"><span>Фон (лучше rgba)</span> <input type="text" class="text_pole" id="ccs-thBg" style="width: 70px; height: 22px; font-size: 10px; padding: 0 4px;"></div>
+                <div class="ccs-color-item"><span>Линия</span> <input type="color" class="ccs-color-swatch" id="ccs-thBorder"></div>
+                <div class="ccs-color-item"><span>Текст</span> <input type="color" class="ccs-color-swatch" id="ccs-thText"></div>
                 <div></div>
             </div>
 
             <div style="margin-top:15px;">
                 <div style="font-size:0.9em; opacity:0.7; margin-bottom: 5px;">Системный Промпт:</div>
-                <textarea id="ccs-prompt" class="text_pole" style="width:100%; height:100px; font-size:0.85em; resize: vertical;"></textarea>
+                <textarea id="ccs-prompt" class="text_pole" style="width:100%; height:130px; font-size:0.85em; resize: vertical;"></textarea>
             </div>
         </div>
     </div>`;
@@ -258,8 +337,7 @@ function loadSettingsUI() {
             delete settings.userThemes[name];
             settings.currentThemeName = "Telegram (Темная)";
 
-            const colorKeys = ['phoneBg', 'phoneIn', 'phoneOut', 'textIn', 'textOut', 'streamBg', 'streamBorder', 'streamText', 'sysBg', 'sysBorder', 'sysText'];
-            colorKeys.forEach(k => { settings[k] = THEMES["Telegram (Темная)"][k]; });
+            COLOR_KEYS.forEach(k => { settings[k] = THEMES["Telegram (Темная)"][k]; });
 
             updateThemeDropdown();
             syncInputs();
@@ -274,12 +352,7 @@ function loadSettingsUI() {
         let theme = THEMES[val] || settings.userThemes[val.replace('user_', '')];
 
         if (theme) {
-            // Копируем ТОЛЬКО цвета из выбранной темы, чтобы не сломать системные переменные
-            const colorKeys = ['phoneBg', 'phoneIn', 'phoneOut', 'textIn', 'textOut', 'streamBg', 'streamBorder', 'streamText', 'sysBg', 'sysBorder', 'sysText'];
-            colorKeys.forEach(k => {
-                settings[k] = theme[k] !== undefined ? theme[k] : defaultSettings[k];
-            });
-
+            COLOR_KEYS.forEach(k => { settings[k] = theme[k] !== undefined ? theme[k] : defaultSettings[k]; });
             syncInputs();
             updateCssVariables();
             updateThemeDropdown();
@@ -287,25 +360,20 @@ function loadSettingsUI() {
         }
     });
 
-    const bind = (id) => {
+    COLOR_KEYS.forEach(id => {
         $(`#ccs-${id}`).on('input', function() {
             const val = $(this).val();
-
             settings[id] = val;
 
             if (settings.currentThemeName.startsWith('user_')) {
                 const userThemeName = settings.currentThemeName.replace('user_', '');
-                if (settings.userThemes[userThemeName]) {
-                    settings.userThemes[userThemeName][id] = val;
-                }
+                if (settings.userThemes[userThemeName]) settings.userThemes[userThemeName][id] = val;
             }
 
             updateCssVariables();
             saveSettingsDebounced();
         });
-    };
-
-    ['phoneBg', 'phoneIn', 'phoneOut', 'textIn', 'textOut', 'streamBg', 'streamBorder', 'streamText', 'sysBg', 'sysBorder', 'sysText'].forEach(bind);
+    });
 
     $('#ccs-prompt').on('input', function() {
         settings.systemPrompt = $(this).val();
